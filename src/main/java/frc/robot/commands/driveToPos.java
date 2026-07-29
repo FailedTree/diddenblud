@@ -8,7 +8,6 @@ public class driveToPos extends Command {
     
     motor sparkMotor;
     double target = 10;
-    
 
 
     public driveToPos(motor eSparkMotor){
