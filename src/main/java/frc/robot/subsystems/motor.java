@@ -25,7 +25,7 @@ public class motor extends SubsystemBase {
     public motor(){
 
 
-        sparkMotor = new SparkMax(1, MotorType.kBrushless);
+        sparkMotor = new SparkMax(5, MotorType.kBrushless);
         sparkMotorConfig = new SparkMaxConfig();
         sparkMotorConfig.idleMode(IdleMode.kCoast).inverted(false);
 
