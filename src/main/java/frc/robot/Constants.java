@@ -22,6 +22,8 @@ public final class Constants {
     public static final int LFId = 2;
     public static final int RFId = 3;
     public static final int RBId = 4;
+
+    public static final double gearRatio = 10.71;
   }
 
 }
