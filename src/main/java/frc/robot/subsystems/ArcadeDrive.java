@@ -25,7 +25,7 @@ public class ArcadeDrive extends SubsystemBase {
     private RelativeEncoder leftRelativeEncoder, rightRelativeEncoder;
     private DifferentialDrive arcadeDrive;
     private DifferentialDriveOdometry odometry;
-    private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(0, 0);
+    private DifferentialDriveWheelPositions wheelPositions;
     
     public ArcadeDrive (){
         
@@ -74,6 +74,7 @@ public class ArcadeDrive extends SubsystemBase {
         rightRelativeEncoder = RLeader.getEncoder();
 
         arcadeDrive = new DifferentialDrive(LLeader, RLeader);
+        wheelPositions = new DifferentialDriveWheelPositions(0, 0);
     }
 
 
@@ -81,7 +82,6 @@ public class ArcadeDrive extends SubsystemBase {
     @Override 
     public void periodic(){
         updateDashboard();
-        wheelPositions.interpolate(wheelPositions, 1);
     }
 
     public void updateDashboard(){
