@@ -11,9 +11,10 @@ import frc.robot.commands.driveToPos;
 import frc.robot.commands.motorBackwards;
 import frc.robot.commands.runMotor;
 import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.TankDrive;
+import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.motor;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,11 +30,11 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
 
-  private final TankDrive Drive = new TankDrive();
+  private final ArcadeDrive drive = new ArcadeDrive();
   private final motor motor = new motor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -41,7 +42,7 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    Drive.setDefaultCommand(new RunCommand(() -> Drive.drive(m_driverController), Drive));
+    drive.setDefaultCommand(new RunCommand(() -> drive.drive(driverController), drive));
   }
 
   /**
@@ -60,9 +61,11 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(new motorBackwards(motor));
-    m_driverController.x().whileTrue(new runMotor(motor));
-    m_driverController.a().whileTrue(new driveToPos(motor));
+    driverController.b().whileTrue(new motorBackwards(motor));
+    driverController.x().whileTrue(new runMotor(motor));
+    driverController.a().whileTrue(new driveToPos(motor));
+
+    driverController.back().onTrue(new InstantCommand(()->drive.resetEncoders(), drive));
   }
 
   /**
@@ -72,6 +75,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
+    return Autos.Autonomous(drive);
   }
 }

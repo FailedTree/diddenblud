@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -8,16 +9,25 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
+import edu.wpi.first.math.kinematics.Odometry;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 
-public class TankDrive extends SubsystemBase {
+public class ArcadeDrive extends SubsystemBase {
 
-    SparkMax LLeader, LFollow, RLeader, RFollow;
-    SparkMaxConfig leftLeadConfig, leftFollowConfig, rightLeadConfig, rightFollowConfig;
+    private SparkMax LLeader, LFollow, RLeader, RFollow;
+    private SparkMaxConfig leftLeadConfig, leftFollowConfig, rightLeadConfig, rightFollowConfig;
+    private RelativeEncoder leftRelativeEncoder, rightRelativeEncoder;
+    private DifferentialDrive arcadeDrive;
+    private DifferentialDriveOdometry odometry;
+    private DifferentialDriveWheelPositions wheelPositions = new DifferentialDriveWheelPositions(0, 0);
     
-    public TankDrive (){
+    public ArcadeDrive (){
         
         /*Instantiate Sparks*/
         LLeader = new SparkMax(DriveConstants.LBId, MotorType.kBrushless);
@@ -59,6 +69,49 @@ public class TankDrive extends SubsystemBase {
         .follow(RLeader);
 
         RFollow.configure(rightFollowConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        leftRelativeEncoder = LLeader.getEncoder();
+        rightRelativeEncoder = RLeader.getEncoder();
+
+        arcadeDrive = new DifferentialDrive(LLeader, RLeader);
+    }
+
+
+
+    @Override 
+    public void periodic(){
+        updateDashboard();
+        wheelPositions.interpolate(wheelPositions, 1);
+    }
+
+    public void updateDashboard(){
+        SmartDashboard.putNumber("Left Rotations", getLeftPos());
+        SmartDashboard.putNumber("Right Rotations", getRightPos());
+    }
+
+    public void resetEncoders(){
+        leftRelativeEncoder.setPosition(0);
+        rightRelativeEncoder.setPosition(0);
+    }
+
+    /**
+     * 
+     * @return Left encoder position in rotations
+     */
+    public double getLeftPos(){
+        return leftRelativeEncoder.getPosition();
+    }
+
+    /**
+     * 
+     * @return Right encoder position in rotations
+     */
+    public double getRightPos(){
+        return rightRelativeEncoder.getPosition();
+    }
+
+    public DifferentialDriveOdometry getOdometry(){
+        return odometry;
     }
 
     public void drive(CommandXboxController driverController){
@@ -75,5 +128,14 @@ public class TankDrive extends SubsystemBase {
 
     }
 
+    /**
+     * 
+     * @param drivePower forward is positive
+     * @param turnPower counterclockwise/left is positive
+     */
+    public void driveArcade(double drivePower, double turnPower){
+
+        arcadeDrive.arcadeDrive(drivePower, turnPower);
+    }
 
 }
