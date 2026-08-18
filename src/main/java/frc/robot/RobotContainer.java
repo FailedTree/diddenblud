@@ -10,8 +10,8 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.driveToPos;
 import frc.robot.commands.motorBackwards;
 import frc.robot.commands.runMotor;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.motor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,9 +30,8 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
 
-  private final ArcadeDrive drive = new ArcadeDrive();
   private final motor motor = new motor();
-
+  private final ArcadeDrive driveSubsystem = new ArcadeDrive();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -42,7 +41,7 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    drive.setDefaultCommand(new RunCommand(() -> drive.drive(driverController), drive));
+    driveSubsystem.setDefaultCommand(new RunCommand(()->driveSubsystem.drive(-driverController.getLeftY(), -driverController.getRightX()), driveSubsystem));
   }
 
   /**
@@ -65,7 +64,6 @@ public class RobotContainer {
     driverController.x().whileTrue(new runMotor(motor));
     driverController.a().whileTrue(new driveToPos(motor));
 
-    driverController.back().onTrue(new InstantCommand(()->drive.resetEncoders(), drive));
   }
 
   /**
@@ -75,6 +73,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return Autos.Autonomous(drive);
+    return Autos.exampleAuto(m_exampleSubsystem);
   }
 }
